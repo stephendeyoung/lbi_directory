@@ -1,0 +1,50 @@
+body li.card img, body li.card{
+	border-radius: 2px;
+}
+body li.card a{
+	display: block;
+	top: -36px;
+	overflow: hidden;
+	background: rgba(241, 0, 28, 0.7);
+	-webkit-transition: top 0.5s;
+}
+body li.card {
+	overflow: hidden;
+	padding: 0;
+	border: none;
+	-moz-box-shadow: 0 0 8px #000;
+	-webkit-box-shadow: 0 0 8px #000;
+	box-shadow: 0 0 8px #000;
+}
+
+body li.card:hover a{
+	top: -97px;
+	-webkit-transition: top 0.5s;
+}
+
+body li.card a span.infoHeading{
+	margin-top:14px;
+}
+
+body li.card a span.infoData:first-child {
+	text-align: center;
+}
+body li.card a span.infoData{
+	clear: both;
+}
+body .reportName {
+	display: block;
+}
+
+html body{
+	background-image: none;
+	background-color: #FBFBFB;
+}
+
+body #content{
+	width: 962px;
+	margin-left: auto;
+	margin-right: auto;
+	background: #ffffff;
+	padding: 0 35px 50px;
+}

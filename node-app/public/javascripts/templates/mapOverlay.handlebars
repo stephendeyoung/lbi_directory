@@ -1,0 +1,20 @@
+<div class='mapOverlay'>
+    <h2>{{NAME}}</h2>
+    {{#if departments}}
+    <form id='departments' method='GET'>
+        <label>Choose a department
+            <select id='department'>
+                {{#each departments}}
+                <option>{{this}}</option>
+                {{/each}}
+            <input type='submit' value='Get Staff Members' class='buttonLarge overlayButton' />
+        </label>
+    </form>
+    <p>Or:</p>
+    {{/if}}
+    <form id='all' method='GET'>
+        <input type='submit' value='Get All Staff' class='buttonLarge overlayButton' />
+    </form>
+    <button id='zoomOut' class='buttonLarge overlayButton'>Choose another office</button>
+</div>
+

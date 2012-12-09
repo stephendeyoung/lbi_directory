@@ -1,0 +1,16 @@
+extends layout
+
+block content
+	div(id='content')
+		div(id='olMask')
+			img(src='/public/img/ajax-loader2.gif')
+		div(id="header", class='clearfix')
+			div(class="headerButtonContainer")
+				a(href="http://lbi.com", class="buttonLarge homePageButton") lbi.com
+				a(href="http://twitter.com/LBiLondon", class="buttonLarge twitterButton") follow us
+			h1(class="logoHeader")
+				span(class="logo")= title
+				span(class="pageSubtitle") Directory
+		h2(class="redHeading") Select an LBi office:
+		div(id='mapContainer')
+		div(id='staffList')

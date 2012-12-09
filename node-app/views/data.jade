@@ -1,0 +1,13 @@
+extends layout
+
+block content
+	h1= title
+	div.data
+		- each datum in data
+			div.data
+				p= datum.sn
+				p= datum.title
+				p= datum.givenName
+				p= datum.department
+				p= datum.employeeNumber
+				p= datum.manager

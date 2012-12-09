@@ -1,0 +1,11 @@
+
+{{#if thumbnailPhoto}}
+<img src='data:image/png;base64,{{thumbnailPhoto}}' class='photo' height='96' width='96' />
+{{else}}
+<img src='/public/img/missing-photo.jpg' class='photo' />
+{{/if}}
+<a>
+    <span class='infoData'> {{givenName}} {{sn}}</span>
+    <span class='infoHeading'> Department:</span>
+    <span class='infoData'> {{department}}</span>
+</a>

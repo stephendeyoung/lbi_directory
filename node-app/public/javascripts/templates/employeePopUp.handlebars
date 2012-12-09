@@ -1,0 +1,40 @@
+<div class="popUp">
+    <button class="close">Close</button>
+    <h3>{{givenName}} {{sn}}</h3>
+    {{#if thumbnailPhoto}}
+    <img class="photo thumbnail" src="data:image/png;base64,{{thumbnailPhoto}}" height="96" width="96" />
+    {{else}}
+    <img src='/public/img/missing-photo.jpg' class='photo thumbnail' />
+    {{/if}}
+    <ul class="stats">
+        {{#if department}}
+        <li>
+            <span class="infoHeading"> Department:</span>
+            <span class='text'> {{department}}</span>
+        </li>
+        {{/if}}
+        {{#if title}}
+        <li>
+            <span class="infoHeading"> Title:</span>
+            <span class='text'> {{title}}</span>
+        </li>
+        {{/if}}
+        {{#if manager}}
+        <li>
+            <span class="infoHeading"> Manager:</span>
+            <span class='text'> {{manager}}</span>
+        </li>
+        {{/if}}
+    </ul>
+    <div class="managerOf">
+        <span class="infoHeading"> Manages:</span>
+        <div class='reportsListWrap'>
+            {{#if manages}}
+            <ul class='reportTo'>
+            </ul>
+            {{else}}
+            <div class='notApplic'> N/A</div>
+            {{/if}}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+doctype 5
+html
+  head
+    title LBi Directory
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='/public/stylesheets/style.css')
+    link(rel='stylesheet', href='/public/stylesheets/cardAnimation.css')
+    script(src='/public/javascripts/libs/require/require.js', data-main='/public/javascripts/main.js')
+
+
+
+  body
+    block content
+  script
+    window.onload = function() {
+        require(['views/createMap'], function(createMap) {
+            var createMap = new createMap;
+        });
+    };
