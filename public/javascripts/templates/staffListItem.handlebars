@@ -1,6 +1,10 @@
 
 {{#if thumbnailPhoto}}
 <img src='data:image/png;base64,{{thumbnailPhoto}}' class='photo' height='96' width='96' />
+{{/if}}
+
+{{#if photo}}
+<img src='/public/img/photos/{{photo}}' class='photo' height='96' width='96' />
 {{else}}
 <img src='/public/img/missing-photo.jpg' class='photo' />
 {{/if}}

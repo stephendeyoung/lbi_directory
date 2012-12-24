@@ -13,14 +13,14 @@ define([
 		initialize: function(models, city) {
 			var deferred = $.Deferred();
 			deferred.done(function() {
-				console.log('hi')
-			})
+				console.log('data loaded')
+			});
 			this.url += city + '/staff';
 			this.fetch({
 				success: function() {
 					deferred.resolve();
 				}
-			})
+			});
 		},
 
 		parse: function(response) {

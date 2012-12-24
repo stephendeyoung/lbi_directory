@@ -2,9 +2,13 @@
     <button class="close">Close</button>
     <h3>{{givenName}} {{sn}}</h3>
     {{#if thumbnailPhoto}}
-    <img class="photo thumbnail" src="data:image/png;base64,{{thumbnailPhoto}}" height="96" width="96" />
+    <img src='data:image/png;base64,{{thumbnailPhoto}}' class='photo' height='96' width='96' />
+    {{/if}}
+
+    {{#if photo}}
+    <img src='/public/img/photos/{{photo}}' class='photo' height='96' width='96' />
     {{else}}
-    <img src='/public/img/missing-photo.jpg' class='photo thumbnail' />
+    <img src='/public/img/missing-photo.jpg' class='photo' />
     {{/if}}
     <ul class="stats">
         {{#if department}}

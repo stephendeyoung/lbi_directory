@@ -9,14 +9,32 @@ var express = require('express')
 
 var app = express();
 
-var db = function(db, callback) {
-	var server = new mongodb.Server("127.0.0.1", 27017, {}),
-		client = new mongodb.Db(db, server, {});
-	callback(server, client);
+// Replace these with your custom settings
+var HOST = '127.0.0.1';
+var PORT = 27017;
+var dbUser = undefined;
+var dbPassword = undefined;
+
+var db = function(res, callback) {
+	var server = new mongodb.Server(HOST, PORT, {});
+	new mongodb.Db('admin', server).open(function (error, client) {
+	    if (error) {
+			res.writeHead(500);
+			res.end('\n');
+		} else {
+			if (dbUser) {
+		        client.authenticate(dbUser, dbPassword, function(err, p_client) {
+					callback(server, client);
+				});
+			} else {
+				callback(server, client);
+			}
+		}
+	});
 };
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', process.env.PORT || 8080);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -45,82 +63,60 @@ app.get('/:city', function(req, res) {
 });
 
 app.get('/countryData/:type', function(req, res) {
-	db('mapData', function(server, client) {
-		client.open(function (error, client) {
+	db(res, function(server, client) {
+		var mapDb = client.db('mapData');
+		var collection = new mongodb.Collection(mapDb, req.params.type);
 
-			if (error) {
-				res.writeHead(500);
-				res.end('\n');
-			} else {
-
-				var collection = new mongodb.Collection(client, req.params.type);
-
-				collection.find({}, {'geometry': 1, 'type': 1, 'properties': 1}).toArray(function(err, docs) {
-					docs.forEach(function(val) {
-						val.ADM0_A3 = val.properties.ADM0_A3;
-						val.NAME = val.properties.NAME;
-						delete val.properties;
-					});
-					res.writeHead(200, {'content-type': 'text/json' });
-					res.write( JSON.stringify({ data : docs}) );
-					res.end('\n');
-					client.close();
-				});
-			}
+		collection.find({}, {'geometry': 1, 'type': 1, 'properties': 1}).toArray(function(err, docs) {
+			docs.forEach(function(val) {
+				val.ADM0_A3 = val.properties.ADM0_A3;
+				val.NAME = val.properties.NAME;
+				delete val.properties;
+			});
+			res.writeHead(200, {'content-type': 'text/json' });
+			res.write( JSON.stringify({ data : docs}) );
+			res.end('\n');
+			client.close();
 		});
 	});
 });
 
 app.get('/countryData/:city/staff', function(req, res) {
-	db('lbi', function(server, client) {
-		client.open(function (error, client) {
-			var collection = new mongodb.Collection(client, 'lbi' + req.params.city.replace(/\s/g, '')),
-				data;
+	db(res, function(server, client) {
+		var cityDb = client.db('cities');
+		var collection = new mongodb.Collection(cityDb, req.params.city.replace(/\s/g, '')),
+		data;
 
-			if (error) {
-				res.writeHead(500);
-				res.end('\n');
-			} else {
+		data = collection.find();
 
-				data = collection.find();
-
-				data.toArray(function(err, docs) {
-					res.writeHead(200, {'content-type': 'text/json' });
-					res.write( JSON.stringify({ staff : docs}) );
-					res.end('\n');
-					client.close();
-				});
-			}
-
+		data.toArray(function(err, docs) {
+			res.writeHead(200, {'content-type': 'text/json' });
+			res.write( JSON.stringify({ staff : docs}) );
+			res.end('\n');
+			client.close();
 		});
 	});
 });
 
 app.get('/countryData/cities/:office', function(req, res) {
-	db('lbi', function(server, client) {
-		client.open(function (error, p_client) {
-			if (error) {
+	db(res, function(server, client) {
+		var cityDb = client.db('cities');
+		var collection = new mongodb.Collection(cityDb, req.params.office.replace(/\s/g, ''));
+
+		collection.distinct('department', function(err, docs) {
+			if (err) {
 				res.writeHead(500);
 				res.end('\n');
-			} else {
-				var collection = new mongodb.Collection(client, 'lbi' + req.params.office.replace(/\s/g, ''));
+			}
 
-				collection.distinct('department', function(err, docs) {
-					if (err) {
-						res.writeHead(500);
-						res.end('\n');
-					}
-
-					else {
-						res.writeHead(200, {'content-type': 'text/json' });
-						res.write( JSON.stringify({
-							departments : docs
-							})
-						);
-						res.end('\n');
-						client.close();
-					}
-				});
+			else {
+				res.writeHead(200, {'content-type': 'text/json' });
+				res.write( JSON.stringify({
+					departments : docs
+					})
+				);
+				res.end('\n');
+				client.close();
 			}
 		});
 	});
@@ -128,16 +124,9 @@ app.get('/countryData/cities/:office', function(req, res) {
 
 app.get('/manager/:name', function(req, res) {
 
-	var server = new mongodb.Server("127.0.0.1", 27017, {}),
-		client = new mongodb.Db('lbi', server, {}),
-		data;
-	client.open(function (error, client) {
-		if (error) {
-			res.writeHead(500);
-			res.end('\n');
-		}
-
-		data = collection.find({'manager': req.params.name}, {'givenName': 1, 'sn': 1, 'thumbnailPhoto': 1, '_id': 1});
+	db(res, function(server, client) {
+		var cityDb = client.db('cities');
+		var data = collection.find({'manager': req.params.name}, {'givenName': 1, 'sn': 1, 'thumbnailPhoto': 1, '_id': 1});
 
 		if (data) {
 			data.toArray(function(err, docs) {

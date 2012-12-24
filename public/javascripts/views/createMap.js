@@ -1,5 +1,6 @@
 // Browser testing
 // More routing (plus remove animation if path exists)
+// Get departments on load
 // Code refactor (Backbone and Node)
 // Tidy UI
 	// Loading icon on staff selection
@@ -74,8 +75,7 @@ define([
 			  		that.getCountries(function(countries) {
 			  			that.drawCountries(countries, function() {
 			  				Cities.fetch({
-			  					success: _.bind(that.render, that, that.beginRouting),
-			  					error: _.bind(that.getCities, that)
+			  					success: _.bind(that.render, that, that.beginRouting)
 			  				});
 			  			});
 			  		});
@@ -105,22 +105,8 @@ define([
 
 	  	getCountries: function(callback) {
 	  		d3.json('/countryData/countries', function(data) {
-	  			if (data) {
-	  				return callback(data.data);
-	  			} else {
-	  				d3.json('public/javascripts/data/countries.geojson', function(data) {
-	  					return callback(data);
-	  				});
-	  			}
+	  			return callback(data.data);
 	  		});
-	  	},
-
-	  	getCities: function() {
-	  		var that = this;
-
-	  		d3.json('public/javascripts/data/lbiCities.json', function(data) {
-				that.render(null, null, {data: data});
-			});
 	  	},
 
 	  	drawCountries: function(countries, callback) {
@@ -128,12 +114,11 @@ define([
 
 	  		that.countries()
 	  			.selectAll("path")
-				.data(countries.features ? countries.features : countries)
+				.data(countries)
 				.enter().append("path")
 				.attr("d", that.path())
 				.attr('id', function(d) {
-					var country = d.ADM0_A3 ? d.ADM0_A3 : d.properties.ADM0_A3;
-					return country;
+					return d.ADM0_A3;
 			  	})
 			  	.each(function(d) {
 					$.data(this, 'centroid', that.path().centroid(d));
@@ -146,16 +131,14 @@ define([
 
 	  	render: function(callback, collection, response) {
 	  		var that = this;
-	  		var data = response.data.features ? response.data.features : response.data;
 
 			that.cities()
 				.selectAll("path")
-				.data(data)
+				.data(response.data)
 				.enter().append("path")
 				.attr("d", that.path())
 				.attr('id', function(d) {
-					var name = d.NAME ? d.NAME : d.properties.NAME;
-					return name.replace(' ', '-');
+					return d.NAME.replace(' ', '-');
 			  	})
 				.on("click", _.bind(that.zoom, that));
 
@@ -171,24 +154,14 @@ define([
 	  	},
 
 	  	zoom: function (d, i) {
-			var dbAvailable = !d.properties,
-				city = d.properties ? d.properties : d,
-				data,
+			var data = Cities.get(d.NAME).get('centroid'),
 				x = 0,
 				y = 0,
 				scale = 1,
 				cities = d3.select('#cities'),
 				countries = d3.select('#countries'),
-				isUSA = city.ADM0_A3 === 'USA',
-				active = cities.selectAll('.active')[0].length > 0 ? cities.selectAll('.active').datum().NAME : false,
-				active2 = cities.selectAll('.active')[0].length > 0 ? cities.selectAll('.active').datum().properties.NAME : false,
-				zoomedIn = active2 === city.NAME ? true : false;
-
-			if (dbAvailable) {
-				data = Cities.get(d.NAME).get('centroid');
-			} else {
-				data = $('#' + city.ADM0_A3).data('centroid');
-			}
+				isUSA = d.ADM0_A3 === 'USA',
+				zoomedIn = cities.selectAll('.active')[0].length > 0 ? cities.selectAll('.active').datum().NAME === d.NAME : false;
 
 			if (!zoomedIn) {
 				x = isUSA ? -data[0] - 100 : -data[0];
@@ -200,21 +173,15 @@ define([
 				cities
 					.selectAll("path")
 					.classed("active", function(datum, index) {
-						var name = datum.properties ? datum.properties.NAME : datum.NAME;
-						return name === city.NAME ? true : false;
+						return d.NAME === datum.NAME ? true : false;
 					})
 					.classed('inactive', function(datum, index) {
-						var name = datum.properties ? datum.properties.NAME : datum.NAME;
-						return name === city.NAME ? false : true;
+						return d.NAME === datum.NAME ? false : true;
 					});
 
-				if (Cities.get(city.NAME)) {
-					this.transition([countries, cities], scale, x, y, function() {
-						this.cityView(Cities.get(city.NAME));
-					});
-				} else {
-					this.transition([countries, cities], scale, x, y);
-				}
+				this.transition([countries, cities], scale, x, y, function() {
+					this.cityView(Cities.get(d.NAME));
+				});
 			} else {
 				cities
 					.select('.active')
