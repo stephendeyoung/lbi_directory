@@ -19,6 +19,7 @@ First clone the repo:
 Then install the dependencies:
 
 ```cd lbi_directory```
+
 ```npm install```
 
 Generate the dummy JSON data:
