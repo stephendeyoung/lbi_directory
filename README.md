@@ -5,7 +5,7 @@ This application came out of the [LBi](http://www.lbi.com/uk/) Interface Develop
 
 Due to data protection issues I haven't provided access to the original data. Dummy data is generated instead.
 
-You can view the application in full here: http://ec2-176-34-85-105.eu-west-1.compute.amazonaws.com:8080/.
+You can view the application in full here: http://stephen-young.me.uk:8080/.
 
 Installation
 ------------
